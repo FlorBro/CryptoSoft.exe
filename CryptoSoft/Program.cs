@@ -6,17 +6,18 @@ using System.Text.Json;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-
-        //Console.WriteLine("Clé binaire de 64 bits : " + binaryKey);
-        Console.WriteLine("Entrez le chemin du dossier");
-        string path_test = Console.ReadLine(); //C:\\Users\\floba\\OneDrive\\Bureau\\Test CryptoSoft
+        if(args.Length < 2)
+        {
+            Console.WriteLine("Veuillez fournir le path du dossier ainsi que C pour Crypter ou D pour Decrypter");
+            return;
+        }
+        string path_test = args[0].ToString(); //C:\\Users\\floba\\OneDrive\\Bureau\\Test CryptoSoft
 
         //Console.WriteLine("Message binaire : " + message);
         string[] fichiers = Directory.GetFiles(path_test);
-        Console.WriteLine("Crypter : C ou Decrypter: D");
-        if (Console.ReadLine() == "C")
+        if (args[1] == "C")
         {
             string binaryKey = GenerateBinaryKey(64);
             foreach (string fichier in fichiers)
@@ -26,7 +27,7 @@ class Program
             }
             keywriter(binaryKey, path_test);
         }
-        else
+        else if(args[1]=="D")
         {
             /////////////////
             string jsonContent = File.ReadAllText(path_test + "\\Key0.json");

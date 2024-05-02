@@ -1,24 +1,47 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using testingproject;
+using System.Text.Json;
 
 class Program
 {
     static void Main()
     {
-        string binaryKey = GenerateBinaryKey(64);
 
         //Console.WriteLine("Clé binaire de 64 bits : " + binaryKey);
+        Console.WriteLine("Entrez le chemin du dossier");
+        string path_test = Console.ReadLine(); //C:\\Users\\floba\\OneDrive\\Bureau\\Test CryptoSoft
 
-        // Affichage du tableau généré
-        Console.WriteLine(string.Join(" ", binaryKey));
         //Console.WriteLine("Message binaire : " + message);
-        string path_test = "C:\\Users\\floba\\OneDrive\\Bureau\\Site\\beethoven.jpg";// "C:\\Users\\floba\\OneDrive\\Bureau\\test"; // modifier pour path entré
-        string extension ='.' + path_test.Split('.')[1];
-        Console.WriteLine(extension);
-        Console.Write(path_test);
-        CrypterFichier(path_test, binaryKey, extension); // + ".txt"
-        DecrypterleFichier(path_test.Split('.')[0] + "_crypte" + extension, binaryKey, extension);
+        string[] fichiers = Directory.GetFiles(path_test);
+        Console.WriteLine("Crypter : C ou Decrypter: D");
+        if (Console.ReadLine() == "C")
+        {
+            string binaryKey = GenerateBinaryKey(64);
+            foreach (string fichier in fichiers)
+            {
+                string extension = '.' + fichier.Split('.')[1];
+                Crypter.CrypterFichier(fichier, binaryKey, extension); // + ".txt"
+            }
+            keywriter(binaryKey, path_test);
+        }
+        else
+        {
+            /////////////////
+            string jsonContent = File.ReadAllText(path_test + "\\Key0.json");
+            JsonDocument jsonDoc = JsonDocument.Parse(jsonContent);
+            JsonElement root = jsonDoc.RootElement;
+            // Utilisation d'un dictionnaire pour stocker les états et leurs valeurs associées
+            string key = root.GetProperty("cle").GetString();
+
+            ////////////////////////
+            foreach (string fichier in fichiers)
+            {
+                string extension = '.' + fichier.Split('.')[1];
+                Decrypter.DecrypterleFichier(fichier.Split('.')[0] + "_crypte" + extension, key, extension);
+            }
+        }
     }
 
     static string GenerateBinaryKey(int length)
@@ -26,50 +49,30 @@ class Program
         Random random = new Random();
         return new string(Enumerable.Range(0, length).Select(_ => (char)('0' + random.Next(2))).ToArray());
     }
-
-    static void CrypterFichier(string cheminFichier, string binarykey, string extension)
+    static string keywriter(string key,string path_test)
     {
-        Console.Write(binarykey);
-        int cle = (int)Convert.ToInt64(binarykey, 2);
-        try
-        {
-            byte[] contenu = File.ReadAllBytes(cheminFichier);
+        int i = 0;
+        string directory = path_test;
 
-            for (int i = 0; i < contenu.Length; i++)
-            {
-                contenu[i] = (byte)(contenu[i] ^ cle);
-            }
-
-            string fichierCrypte = cheminFichier.Replace(extension, "_crypte" + extension);
-            File.WriteAllBytes(fichierCrypte, contenu);
-
-            Console.WriteLine("Fichier crypté avec succès. Chemin du fichier crypté : " + fichierCrypte);
+        string FichierJson = "Key" + i.ToString() + ".json";
+        string path = Path.Combine(directory, FichierJson);
+        if (File.Exists(path)) {
+            i = +1;
+            FichierJson = "Key" + i.ToString() + ".json";
+            path = Path.Combine(directory, FichierJson);
         }
-        catch (Exception ex)
+
+        var donnees = new
         {
-            Console.WriteLine("Erreur : " + ex.Message);
-        }
-    }
-    static void DecrypterleFichier(string fichierCrypte, string binarykey, string extension)
-        {
-            int cle = (int)Convert.ToInt64(binarykey, 2);
-            try
-            {
-                byte[] contenu = File.ReadAllBytes(fichierCrypte);
-
-                for (int i = 0; i < contenu.Length; i++)
-                {
-                    contenu[i] = (byte)(contenu[i] ^ cle);
-            }
-
-                string fichierdeCrypte = fichierCrypte.Replace("_crypte" + extension, "_decrypte" + extension);
-                File.WriteAllBytes(fichierdeCrypte, contenu);
-
-                Console.WriteLine("Fichier decrypté avec succès. Chemin du fichier decrypté : " + fichierdeCrypte);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erreur : " + ex.Message);
-            }
-        }
+            cle = key,
+        };
+        string json = JsonSerializer.Serialize(donnees);
+        File.WriteAllText(path, json);
+        Console.WriteLine($"clé écrites dans le fichier JSON au chemin: {path} ");
+        return path;
+    } 
+}
+public class CleData
+{
+    public string Cle { get; set; }
 }

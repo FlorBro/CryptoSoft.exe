@@ -20,10 +20,10 @@ namespace testingproject
                     contenu[i] = (byte)(contenu[i] ^ cle);
                 }
 
-                string fichierCrypte = cheminFichier.Replace(extension, "_crypte" + extension);
-                File.WriteAllBytes(fichierCrypte, contenu);
+                //string fichierCrypte = cheminFichier.Replace(extension, "_crypte" + extension);
+                File.WriteAllBytes(cheminFichier, contenu);
 
-                Console.WriteLine("Fichier crypté avec succès. Chemin du fichier crypté : " + fichierCrypte);
+                Console.WriteLine("Fichier crypté avec succès. Chemin du fichier crypté : " + cheminFichier);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,15 +21,16 @@ namespace testingproject
                     contenu[i] = (byte)(contenu[i] ^ cle);
                 }
 
-                string fichierdeCrypte = fichierCrypte.Replace("_crypte" + extension, "_decrypte" + extension);
-                File.WriteAllBytes(fichierdeCrypte, contenu);
+               
+                File.WriteAllBytes(fichierCrypte, contenu);
 
-                Console.WriteLine("Fichier decrypté avec succès. Chemin du fichier decrypté : " + fichierdeCrypte);
+                Console.WriteLine("Fichier decrypté avec succès. Chemin du fichier decrypté : " + fichierCrypte);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Erreur : " + ex.Message);
             }
+           
         }
     }
 }

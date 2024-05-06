@@ -40,8 +40,9 @@ class Program
             foreach (string fichier in fichiers)
             {
                 string extension = '.' + fichier.Split('.')[1];
-                Decrypter.DecrypterleFichier(fichier.Split('.')[0] + "_crypte" + extension, key, extension);
+                Decrypter.DecrypterleFichier(fichier, key, extension);  
             }
+            File.Delete(path_test + "\\Key0.json"); 
         }
     }
 
